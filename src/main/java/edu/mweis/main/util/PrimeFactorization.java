@@ -1,5 +1,6 @@
 package edu.mweis.main.util;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.*;
 
@@ -9,13 +10,13 @@ import java.util.TreeSet;
 
 public final class PrimeFactorization implements Comparable<PrimeFactorization> {
 
-    private static long largestCachedValue = 0L;
+    private static int largestCachedValue = 0;
     private final static SortedSet<PrimeFactorization> cache = new TreeSet<>();
     static {
         cache.add(new PrimeFactorization());
     }
 
-    private final long n;
+    private final int n;
     private final ImmutableSortedMultiset<BigInteger> factors;
 
     /**
@@ -25,10 +26,10 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      * case of n > 1
      *
      * @param n the value whose prime factorization is to be computed. note that values should be relatively small
-     *          (don't let the type long imply a large n value, as this type is done to make converting from long
+     *          (don't let the type int imply a large n value, as this type is done to make converting from int
      *          to {@link BigInteger} easier). Anything above 35! would be more than enough to change the world.
      */
-    private PrimeFactorization(long n) {
+    private PrimeFactorization(int n) {
         assert (n > 2);
         assert (n < 2000); // anything above 35! would change the the world. be smart.
 
@@ -36,22 +37,20 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
 
         final SortedMultiset<BigInteger> tmp = TreeMultiset.create();
 
-//        cache.iterator().forEachRemaining(primeFactorization -> tmp.addAll(primeFactorization.getFactors()));
-
-        while (n % 2L == 0L) {
-            tmp.add(BigInteger.valueOf(2L));
-            n /= 2L;
+        while (n % 2 == 0) {
+            tmp.add(BigInteger.valueOf(2));
+            n /= 2;
         }
 
-        for (long i = 3L; i <= Math.sqrt(n); i += 2L) {
-            while (n % i == 0L)
+        for (int i = 3; i <= Math.sqrt(n); i += 2) {
+            while (n % i == 0)
             {
                 tmp.add(BigInteger.valueOf(i));
                 n /= i;
             }
         }
 
-        if (n > 2L) {
+        if (n > 2) {
             tmp.add(BigInteger.valueOf(n));
         }
 
@@ -65,7 +64,7 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      * case of n == 1
      */
     private PrimeFactorization() {
-        this.n = 1L;
+        this.n = 1;
         this.factors = ImmutableSortedMultiset.of(BigInteger.ONE);
         largestCachedValue = this.n;
         assert (!cache.contains(this));
@@ -77,7 +76,7 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      * @param n the number to get
      * @return the PrimeFactorization representing this value n
      */
-    public static PrimeFactorization of(long n) {
+    public static PrimeFactorization of(int n) {
         if (n == 1) {
             return cache.first();
         } else if (largestCachedValue < n) {
@@ -86,7 +85,7 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
         } else if (largestCachedValue == n) {
             return cache.last();
         } else {
-            return Iterators.get(cache.iterator(), (int)n-1);
+            return Iterators.get(cache.iterator(), n-1);
         }
     }
 
@@ -101,21 +100,18 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
 
     @Override
     public String toString() {
-        return "PrimeFactorization{" +
-                "n=" + n +
-                ", factors=" + factors.toString() +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("n", n)
+                .add("factors", factors)
+                .toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        } else if (!(o instanceof PrimeFactorization)){
-            return false;
-        } else {
-            return n == ((PrimeFactorization) o).n;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PrimeFactorization that = (PrimeFactorization) o;
+        return n == that.n;
     }
 
     @Override
@@ -124,6 +120,6 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
     }
 
     public int compareTo(PrimeFactorization o) {
-        return Long.compare(n, o.n);
+        return Integer.compare(n, o.n);
     }
 }
