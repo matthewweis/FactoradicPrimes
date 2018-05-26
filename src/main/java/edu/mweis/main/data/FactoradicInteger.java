@@ -1,4 +1,4 @@
-package edu.mweis.main.util;
+package edu.mweis.main.data;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;

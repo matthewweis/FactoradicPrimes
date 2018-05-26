@@ -1,4 +1,4 @@
-package edu.mweis.main.util;
+package edu.mweis.main.data;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -47,6 +47,14 @@ public final class Factorial implements Comparable<Factorial> {
         } else {
             return Iterators.get(cache.iterator(), n-1);
         }
+    }
+
+    public BigInteger getN() {
+        return n; // n is the given number which generated this factorial (ex: if value = 6, then n=3 as 3! = 6)
+    }
+
+    public BigInteger getValue() {
+        return value;
     }
 
     @Override

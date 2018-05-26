@@ -1,4 +1,4 @@
-package edu.mweis.main.util;
+package edu.mweis.main.data;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -65,7 +65,7 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      */
     private PrimeFactorization() {
         this.n = 1;
-        this.factors = ImmutableSortedMultiset.of(BigInteger.ONE);
+        this.factors = ImmutableSortedMultiset.of();
         largestCachedValue = this.n;
         assert (!cache.contains(this));
         cache.add(this);
