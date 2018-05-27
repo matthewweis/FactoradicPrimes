@@ -1,50 +1,62 @@
 package edu.mweis.main;
 
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 import edu.mweis.main.data.FactoradicInteger;
 import edu.mweis.main.data.Factorial;
 import edu.mweis.main.data.PrimeFactorization;
 
 import java.math.BigInteger;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class BigPrimeTest {
 
-    private BigPrimeTest() { }
-
     /**
      * determines the primality of a potentialPrime using the factorization technique
-     * @param potentialPrime the integer whose prime value is to be determined
+     * @param potentialPrime the integer whose prime value is to be determined (must be greater than 3)
      * @return the primality of potentialPrime
      */
-    public boolean isPrime(BigInteger potentialPrime) {
+    public static boolean isPrime(BigInteger potentialPrime) {
+
+        if (potentialPrime.mod(BigInteger.valueOf(2L)).equals(BigInteger.ZERO)) {
+            return potentialPrime.equals(BigInteger.valueOf(2L));
+        }
 
         /**
           1) Decompose potentialPrime into factoradic form
          */
         final FactoradicInteger factoradic = new FactoradicInteger(potentialPrime);
-//        System.out.println(factoradic);
 
         /**
           2) Iterate from low to high over all non-zero place values whose position is in the range [3, n]
          */
 
-        BigInteger lastSum = factoradic.getDigit(0).multiply(Factorial.of(1).getValue()); // for 2.a.opt
+        BigInteger lastSum = factoradic.getDigit(0).multiply(Factorial.of(1).getValue()); // for 2.a.opt1
         final Set<BigInteger> cumFactors = new TreeSet<>(PrimeFactorization.of(1).getFactors()); // for 2.b.opt2
 
         for (int i=1; i < factoradic.getSize(); i++) {
 
             /**
-              2.a) Sum all values less than i
+              2.a) Sum all values less than j, where j < i, and place(j) has at least 1 less distinct element (not count)
 
-                  OPTIMIZATION: adding to previous value instead of recomputing all
+                  OPTIMIZATION 1: adding to previous value instead of recomputing all
+                  OPTIMIZATION 2: skip any places where digit equals 0
              */
 
-            final BigInteger cumSum = lastSum.add(factoradic.getDigit(i).multiply(Factorial.of(i+1).getValue()));
             cumFactors.addAll(PrimeFactorization.of(i+1).getFactors()); // for 2.b.opt2
+
+//            if (factoradic.getDigit(i).equals(BigInteger.ZERO)) { // for 2.a.opt2
+//                continue;
+//            }
+
+            final BigInteger cumSum = lastSum.add(factoradic.getDigit(i).multiply(Factorial.of(i+1).getValue()));
+
 
             /**
               2.b) Return "composite" if cumSum divides any factor of i!
@@ -54,12 +66,23 @@ public class BigPrimeTest {
              */
 
             final Predicate<BigInteger> predicate = factor -> cumSum.mod(factor).equals(BigInteger.ZERO);
-//            System.out.println(cumFactors.toString());
+
             if (Iterators.any(cumFactors.iterator(), predicate::test)) {
                 return false;
             }
 
-            lastSum = cumSum; // for 2.a.opt
+//            Iterator<BigInteger> iterator = cumFactors.iterator();
+//            while (iterator.hasNext()) {
+//                final BigInteger next = iterator.next();
+//                //System.out.printf("does %s mod %s equal 0?  ", cumSum.toString(), next);
+//                if (cumSum.mod(next).equals(BigInteger.ZERO)) {
+//                    //System.out.println("YES");
+//                    return false;
+//                }
+//                //System.out.println("NO");
+//            }
+
+            lastSum = cumSum; // for 2.a.opt1
         }
 
         /**
@@ -69,9 +92,9 @@ public class BigPrimeTest {
     }
 
     public static void main(String[] args) {
-//        for (int i=1; i < 20; i++) {
-//            System.out.println(PrimeFactorization.of(i).toString());
-//        }
+        for (int i=119; i < 2000; i++) {
+            System.out.println(new FactoradicInteger(BigInteger.valueOf(i)));
+        }
 //
 //        p(Multisets.union(PrimeFactorization.of(2).getFactors(), PrimeFactorization.of(3).getFactors()).toString());
 //
@@ -80,10 +103,8 @@ public class BigPrimeTest {
 //        }
 
         try (Scanner scanner = new Scanner(System.in)) {
-            final BigPrimeTest bigPrimeTest = new BigPrimeTest();
-
             while (scanner.hasNextBigInteger()) {
-                System.out.println(bigPrimeTest.isPrime(scanner.nextBigInteger()));
+                System.out.println(BigPrimeTest.isPrime(scanner.nextBigInteger()));
             }
         }
 

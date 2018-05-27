@@ -30,8 +30,8 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      *          to {@link BigInteger} easier). Anything above 35! would be more than enough to change the world.
      */
     private PrimeFactorization(int n) {
-        assert (n > 2);
-        assert (n < 2000); // anything above 35! would change the the world. be smart.
+//        assert (n > 2);
+//        assert (n < 2000);
 
         this.n = n;
 

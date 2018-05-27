@@ -6,13 +6,15 @@ import com.google.common.base.Objects;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class FactoradicInteger {
+public class FactoradicInteger implements Comparable<FactoradicInteger> {
 
     private final BigInteger value;
     private final int size;
     private final BigInteger[] digits; // where 0 is LSB
+    private final BigInteger[] reversedDigits; // todo remove
 
     public FactoradicInteger(BigInteger value) {
         this.value = value;
@@ -31,6 +33,10 @@ public class FactoradicInteger {
         this.size = radix.intValueExact() - 2; // subtract 2 (since we started at 2)
         this.digits = new BigInteger[size]; // "exact" means throw exception if too large
         final BigInteger[] ret = digitValues.toArray(digits);
+
+        Collections.reverse(digitValues);
+        this.reversedDigits = new BigInteger[size];
+        digitValues.toArray(reversedDigits);
 
         assert (Arrays.deepEquals(ret, digits));
         // if assertion never thrown, can replace with "digitValues.toArray(digits);"
@@ -53,7 +59,7 @@ public class FactoradicInteger {
         return MoreObjects.toStringHelper(this)
                 .add("value", value)
                 .add("size", size)
-                .add("digits", digits)
+                .add("rdigits", reversedDigits)
                 .toString();
     }
 
@@ -68,5 +74,13 @@ public class FactoradicInteger {
     @Override
     public int hashCode() {
         return Objects.hashCode(value);
+    }
+
+    @Override
+    public int compareTo(FactoradicInteger o) {
+        if (o != null) {
+            return value.compareTo(o.value);
+        }
+        return 1;
     }
 }
