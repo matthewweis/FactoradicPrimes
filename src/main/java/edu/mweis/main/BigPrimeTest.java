@@ -1,19 +1,15 @@
 package edu.mweis.main;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 import edu.mweis.main.data.FactoradicInteger;
 import edu.mweis.main.data.Factorial;
 import edu.mweis.main.data.PrimeFactorization;
+import edu.mweis.main.data.PrimeSystemInt;
 
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class BigPrimeTest {
 
@@ -40,7 +36,7 @@ public class BigPrimeTest {
         BigInteger lastSum = factoradic.getDigit(0).multiply(Factorial.of(1).getValue()); // for 2.a.opt1
         final Set<BigInteger> cumFactors = new TreeSet<>(PrimeFactorization.of(1).getFactors()); // for 2.b.opt2
 
-        for (int i=1; i < factoradic.getSize(); i++) {
+        for (int i=0; i < factoradic.getSize(); i++) {
 
             /**
               2.a) Sum all values less than j, where j < i, and place(j) has at least 1 less distinct element (not count)
@@ -51,9 +47,9 @@ public class BigPrimeTest {
 
             cumFactors.addAll(PrimeFactorization.of(i+1).getFactors()); // for 2.b.opt2
 
-//            if (factoradic.getDigit(i).equals(BigInteger.ZERO)) { // for 2.a.opt2
-//                continue;
-//            }
+            if (factoradic.getDigit(i).equals(BigInteger.ZERO)) { // for 2.a.opt2
+                continue;
+            }
 
             final BigInteger cumSum = lastSum.add(factoradic.getDigit(i).multiply(Factorial.of(i+1).getValue()));
 
@@ -92,21 +88,29 @@ public class BigPrimeTest {
     }
 
     public static void main(String[] args) {
-        for (int i=119; i < 2000; i++) {
-            System.out.println(new FactoradicInteger(BigInteger.valueOf(i)));
+//        for (int i=3; i < 100; i++) {
+//            System.out.println(new PrimeSystemInt(BigInteger.valueOf(i)));
+//        }
+
+//        System.out.println(new PrimeSystemInt(BigInteger.valueOf(25)));
+//        System.out.println(new PrimeSystemInt(BigInteger.valueOf(25)));
+
+        for (int i=3; i < 300; i++) {
+            System.out.println(new PrimeSystemInt(BigInteger.valueOf(i)));
         }
+
 //
 //        p(Multisets.union(PrimeFactorization.of(2).getFactors(), PrimeFactorization.of(3).getFactors()).toString());
 //
 //        for (int i=2; i < 20; i++) {
 //            p(Factorial.of(i).toString());
 //        }
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (scanner.hasNextBigInteger()) {
-                System.out.println(BigPrimeTest.isPrime(scanner.nextBigInteger()));
-            }
-        }
+//
+//        try (Scanner scanner = new Scanner(System.in)) {
+//            while (scanner.hasNextBigInteger()) {
+//                System.out.println(BigPrimeTest.isPrime(scanner.nextBigInteger()));
+//            }
+//        }
 
     }
 }

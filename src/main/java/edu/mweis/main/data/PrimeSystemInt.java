@@ -8,29 +8,46 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class FactoradicInteger implements Comparable<FactoradicInteger> {
+public class PrimeSystemInt implements Comparable<PrimeSystemInt> {
+
+    private static final int[] PRIMES = {
+            2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
+            47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103,
+            107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163,
+            167, 173, 179, 181, 191, 193, 197, 199
+    };
 
     private final BigInteger value;
     private final int size;
     private final BigInteger[] digits; // where 0 is LSB
     private final BigInteger[] reversedDigits; // todo remove
 
-    public FactoradicInteger(BigInteger value) {
+    public PrimeSystemInt(BigInteger value) {
         this.value = value;
 
         final List<BigInteger> digitValues = new ArrayList<>();
         BigInteger tmp = value;
-        BigInteger radix = BigInteger.valueOf(2);
+        int counter = 1;
+        /**
+         * Start at PRIMES[0] for radixs: 1, 3, 5, ...
+         * Start at PRIMES[1] for radixs: 3, 5, ... (in other words ignore the "1" bit case at end)
+         *  => however calculating value in expanded notation still uses 1, 3, 5, ...
+         *  => ex: 35 = [1, 5, 2] = 1 * 5 + 5 * 3 + 2 * 1 =
+         */
 
         do {
-            final BigInteger[] ret = tmp.divideAndRemainder(radix);
+            final BigInteger[] ret = tmp.divideAndRemainder(BigInteger.valueOf(PRIMES[counter]));
             tmp = ret[0];
             digitValues.add(ret[1]);
-            radix = radix.add(BigInteger.ONE);
+            counter++;
+            if (counter == PRIMES.length) {
+                throw new IllegalArgumentException("TOO BIG xd");
+            }
         } while (!tmp.equals(BigInteger.ZERO));
 
-        this.size = radix.intValueExact() - 2; // subtract 2 (since we started at 2)
+        this.size = counter-1;
         this.digits = new BigInteger[size]; // "exact" means throw exception if too large
         final BigInteger[] ret = digitValues.toArray(digits);
 
@@ -71,7 +88,7 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FactoradicInteger that = (FactoradicInteger) o;
+        PrimeSystemInt that = (PrimeSystemInt) o;
         return Objects.equal(value, that.value);
     }
 
@@ -81,7 +98,7 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
     }
 
     @Override
-    public int compareTo(FactoradicInteger o) {
+    public int compareTo(PrimeSystemInt o) {
         if (o != null) {
             return value.compareTo(o.value);
         }

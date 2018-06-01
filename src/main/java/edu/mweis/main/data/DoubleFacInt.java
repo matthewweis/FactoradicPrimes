@@ -9,28 +9,32 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class FactoradicInteger implements Comparable<FactoradicInteger> {
+public class DoubleFacInt implements Comparable<DoubleFacInt> {
 
     private final BigInteger value;
     private final int size;
     private final BigInteger[] digits; // where 0 is LSB
     private final BigInteger[] reversedDigits; // todo remove
 
-    public FactoradicInteger(BigInteger value) {
+    public DoubleFacInt(BigInteger value) {
+
         this.value = value;
 
         final List<BigInteger> digitValues = new ArrayList<>();
         BigInteger tmp = value;
-        BigInteger radix = BigInteger.valueOf(2);
+        final BigInteger two = BigInteger.valueOf(2);
+        BigInteger radix = BigInteger.valueOf(3);
+        int counter = 0;
 
         do {
             final BigInteger[] ret = tmp.divideAndRemainder(radix);
             tmp = ret[0];
             digitValues.add(ret[1]);
-            radix = radix.add(BigInteger.ONE);
+            radix = radix.multiply(radix.add(two));
+            counter++;
         } while (!tmp.equals(BigInteger.ZERO));
 
-        this.size = radix.intValueExact() - 2; // subtract 2 (since we started at 2)
+        this.size = counter;
         this.digits = new BigInteger[size]; // "exact" means throw exception if too large
         final BigInteger[] ret = digitValues.toArray(digits);
 
@@ -40,6 +44,7 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
 
         assert (Arrays.deepEquals(ret, digits));
         // if assertion never thrown, can replace with "digitValues.toArray(digits);"
+
     }
 
     public BigInteger getValue() {
@@ -71,7 +76,7 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FactoradicInteger that = (FactoradicInteger) o;
+        DoubleFacInt that = (DoubleFacInt) o;
         return Objects.equal(value, that.value);
     }
 
@@ -81,7 +86,7 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
     }
 
     @Override
-    public int compareTo(FactoradicInteger o) {
+    public int compareTo(DoubleFacInt o) {
         if (o != null) {
             return value.compareTo(o.value);
         }
