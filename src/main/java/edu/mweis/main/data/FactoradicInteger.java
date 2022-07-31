@@ -4,15 +4,15 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class FactoradicInteger implements Comparable<FactoradicInteger> {
 
     private final BigInteger value;
-    private final int size;
+    private final int numDigits;
     private final BigInteger[] digits; // where 0 is LSB
     private final BigInteger[] reversedDigits; // todo remove
 
@@ -22,20 +22,22 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
         final List<BigInteger> digitValues = new ArrayList<>();
         BigInteger tmp = value;
         BigInteger radix = BigInteger.valueOf(2);
-
+        int counter = 0;
         do {
             final BigInteger[] ret = tmp.divideAndRemainder(radix);
             tmp = ret[0];
             digitValues.add(ret[1]);
             radix = radix.add(BigInteger.ONE);
+            counter++;
         } while (!tmp.equals(BigInteger.ZERO));
 
-        this.size = radix.intValueExact() - 2; // subtract 2 (since we started at 2)
-        this.digits = new BigInteger[size]; // "exact" means throw exception if too large
+//        this.numDigits = radix.intValueExact() - 2; // subtract 2 (since we started at 2)
+        this.numDigits = counter;
+        this.digits = new BigInteger[numDigits]; // "exact" means throw exception if too large
         final BigInteger[] ret = digitValues.toArray(digits);
 
         Collections.reverse(digitValues);
-        this.reversedDigits = new BigInteger[size];
+        this.reversedDigits = new BigInteger[numDigits];
         digitValues.toArray(reversedDigits);
 
         assert (Arrays.deepEquals(ret, digits));
@@ -46,8 +48,8 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
         return value;
     }
 
-    public int getSize() {
-        return size;
+    public int getNumDigits() {
+        return numDigits;
     }
 
     public BigInteger getDigit(int index) {
@@ -58,7 +60,7 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("value", value)
-                .add("size", size)
+                .add("numDigits", numDigits)
                 .add("rdigits", reversedDigits)
                 .toString();
     }
@@ -66,6 +68,12 @@ public class FactoradicInteger implements Comparable<FactoradicInteger> {
     public String toShortString() {
         return Arrays.toString(reversedDigits);
     }
+
+  public String toPrettyString() {
+    return Stream.of(reversedDigits)
+            .map(BigInteger::toString)
+            .collect(Collectors.joining("! + ", "", "!"));
+  }
 
     @Override
     public boolean equals(Object o) {

@@ -18,7 +18,8 @@ import static org.junit.Assert.*;
 
 public class BigPrimeTestTest {
 
-    private final static int NUM_PRIMES_TO_TEST = 7919;//200000;
+//    private final static int NUM_PRIMES_TO_TEST = 7919;//200000;
+private final static int NUM_PRIMES_TO_TEST = 100000000;//200000;
 
     // see: https://gist.githubusercontent.com/cblanc/46ebbba6f42f61e60666/raw/8306166ecb892cedb0555f87eaa4f5f7e02980de/gistfile1.txt
 
@@ -26,7 +27,7 @@ public class BigPrimeTestTest {
     public void isPrime() {
 //        PrintStream out = null;
 //        try {
-//            out = new PrintStream(new FileOutputStream("output.txt"));
+//            out = new PrintStream(new FileOutputStream("generated.txt"));
 //        } catch (FileNotFoundException e) {
 //            e.printStackTrace();
 //        }
@@ -54,16 +55,21 @@ public class BigPrimeTestTest {
 //        }
 
 
-//        for (int n=3; n <= testSieve.getLimit(); n += 2) {
+        for (int n=3; n <= NUM_PRIMES_TO_TEST; n ++) {
 //            if (!testSieve.isPrime(n)) {
 //                continue;
 //            }
-//            final BigInteger potPrime = BigInteger.valueOf(n);
-//
-//            final String s = new FactoradicInteger(potPrime).toShortString();
-//            final String sPad = Strings.padStart(s, 22, ' ');
+            final BigInteger potPrime = BigInteger.valueOf(n);
+
+            final String s = new FactoradicInteger(potPrime).toShortString();
+            final String sPad = Strings.padStart(s, 22, ' ');
 //            System.out.format("%s = %d (%s)\n", sPad, n, testSieve.isPrime(n));
-//        }
+//            System.out.format("%s = %d\n", sPad, n);
+            boolean isPrime = BigPrimeTest.isPrime(potPrime);
+            if (testSieve.isPrime(n) != isPrime) {
+                System.out.format("%s = %d (%s)\n", sPad, n, isPrime);
+            }
+        }
 //        System.out.println();
 //        for (int n=3; n <= testSieve.getLimit(); n += 2) {
 //            if (testSieve.isPrime(n)) {
@@ -106,16 +112,37 @@ public class BigPrimeTestTest {
 //            System.out.format("%s = %d (%s)\n", sPad, n, testSieve.isPrime(n));
 //        }
 
+//        int j = 3;
+//        while (j < testSieve.getLimit()) {
+//            final FactoradicInteger _j = new FactoradicInteger(BigInteger.valueOf(j));
+//            final FactoradicInteger f = new FactoradicInteger(BigInteger.valueOf(j * j));
+//            if (j*j % 5 == 0) {
+//                j += 2;
+//                continue;
+//            }
+//            System.out.println(_j + " : " + f);
+//            j += 2;
+//        }
 
-        for (int n=3; n <= testSieve.getLimit(); n++) {
+//        for (int n=3; n <= testSieve.getLimit(); n += 2) {
 
-            if (testSieve.isPrime(n) == !BigPrimeTest.isPrime(BigInteger.valueOf(n))) {
-                System.out.print(n + ",");
+//            if (BigPrimeTest.isPrime(BigInteger.valueOf(n))) {
+//                System.out.print(n + " prime \n");
+//            } else {
+//                System.out.print(n + " composite \n");
+//            }
+
+//            if (BigPrimeTest.isPrime(BigInteger.valueOf(n*n))) {
+//                System.out.print(n + ", ");
+//            }
+
+//            if (testSieve.isPrime(n) != BigPrimeTest.isPrime(BigInteger.valueOf(n))) {
+//                System.out.print(new FactoradicInteger(BigInteger.valueOf(n)) + "," + '\n');
 //                final FactoradicInteger f = new FactoradicInteger(BigInteger.valueOf(n));
 //                System.out.println(f + ", " + PrimeFactorization.of(n));
 //
 //                Set<FactoradicInteger> s = new TreeSet<>();
-//                for (int i=1; i <= f.getSize(); i++) {
+//                for (int i=1; i <= f.getNumDigits(); i++) {
 //                    PrimeFactorization.of(i).getFactors().forEach(a -> s.add(new FactoradicInteger(a)));
 //                }
 //                System.out.println(s.toString() +"\n");
@@ -130,9 +157,9 @@ public class BigPrimeTestTest {
 //                System.out.println(Integer.toString(n, 6) + "  (base 6)");
 //                PrimeFactorization.of(i).getFactors();
 
-            }
+//            }
             //assertEquals(testSieve.isPrime(n), BigPrimeTest.isPrime(BigInteger.valueOf(n)));
-        }
+//        }
 
     }
 }

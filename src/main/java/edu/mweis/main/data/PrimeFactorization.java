@@ -18,11 +18,10 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
 
     private final int n;
     private final ImmutableSortedMultiset<BigInteger> factors;
+    private final ImmutableSortedMultiset<Integer> intFactors;
 
     /**
-     * see: https://www.geeksforgeeks.org/print-all-prime-factors-of-a-given-number/
-     *
-     * THIS CONSTRUCTOR IS CALLED IF AND ONLY IF IT DOESN'T YET EXIST IN THE CACHE.
+     * THIS CONSTRUCTOR IS CALLED IF IT DOESN'T YET EXIST IN THE CACHE.
      * case of n > 1
      *
      * @param n the value whose prime factorization is to be computed. note that values should be relatively small
@@ -30,31 +29,34 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      *          to {@link BigInteger} easier). Anything above 35! would be more than enough to change the world.
      */
     private PrimeFactorization(int n) {
-//        assert (n > 2);
-//        assert (n < 2000);
 
         this.n = n;
 
-        final SortedMultiset<BigInteger> tmp = TreeMultiset.create();
+        final ImmutableSortedMultiset.Builder<BigInteger> builder = ImmutableSortedMultiset.naturalOrder();
+        final ImmutableSortedMultiset.Builder<Integer> intBuilder = ImmutableSortedMultiset.naturalOrder();
 
         while (n % 2 == 0) {
-            tmp.add(BigInteger.valueOf(2));
+            builder.add(BigInteger.valueOf(2));
+            intBuilder.add(2);
             n /= 2;
         }
 
         for (int i = 3; i <= Math.sqrt(n); i += 2) {
             while (n % i == 0)
             {
-                tmp.add(BigInteger.valueOf(i));
+                builder.add(BigInteger.valueOf(i));
+                intBuilder.add(i);
                 n /= i;
             }
         }
 
         if (n > 2) {
-            tmp.add(BigInteger.valueOf(n));
+            builder.add(BigInteger.valueOf(n));
+            intBuilder.add(n);
         }
 
-        this.factors = ImmutableSortedMultiset.copyOf(tmp);
+        this.factors = builder.build();
+        this.intFactors = intBuilder.build();
         largestCachedValue = this.n;
         assert (!cache.contains(this));
         cache.add(this);
@@ -66,6 +68,7 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
     private PrimeFactorization() {
         this.n = 1;
         this.factors = ImmutableSortedMultiset.of();
+        this.intFactors = ImmutableSortedMultiset.of();
         largestCachedValue = this.n;
         assert (!cache.contains(this));
         cache.add(this);
@@ -89,6 +92,18 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
         }
     }
 
+    public static ImmutableSortedMultiset<Integer> of(Factorial f) {
+        final ImmutableSortedMultiset.Builder<Integer> tmp = ImmutableSortedMultiset.naturalOrder();
+        int facLen = f.getN().intValueExact();
+
+        for (int n=1; n <= facLen; n++) {
+            final ImmutableSortedMultiset<Integer> intFactors = PrimeFactorization.of(n).getIntFactors();
+            intFactors.forEach(integer -> tmp.addCopies(integer, intFactors.count(integer)));
+        }
+
+        return tmp.build();
+    }
+
     /**
      * DO NOT USE EQUALS ON THE RETURN VALUE OF THIS METHOD.
      * (see https://google.github.io/guava/releases/22.0/api/docs/com/google/common/collect/TreeMultiset.html)
@@ -96,6 +111,15 @@ public final class PrimeFactorization implements Comparable<PrimeFactorization> 
      */
     public ImmutableSortedMultiset<BigInteger> getFactors() {
         return factors;
+    }
+
+    /**
+     * DO NOT USE EQUALS ON THE RETURN VALUE OF THIS METHOD.
+     * (see https://google.github.io/guava/releases/22.0/api/docs/com/google/common/collect/TreeMultiset.html)
+     * @return an immutable sorted multiset of all prime factors and their occurrences. DO NOT .EQUALS() THIS VALUE.
+     */
+    public ImmutableSortedMultiset<Integer> getIntFactors() {
+        return intFactors;
     }
 
     @Override

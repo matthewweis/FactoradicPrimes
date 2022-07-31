@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Iterators;
 
 import java.math.BigInteger;
+import java.util.Scanner;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
